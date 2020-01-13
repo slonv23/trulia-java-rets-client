@@ -6,10 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
+import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
@@ -26,6 +23,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.realtors.rets.common.util.CaseInsensitiveTreeMap;
 
 public class CommonsHttpClient extends RetsHttpClient {
+	private static final int MAX_CONNECTIONS = 200;
 	private static final int DEFAULT_TIMEOUT = 300000;
 	private static final String RETS_VERSION = "RETS-Version";
 	private static final String RETS_SESSION_ID = "RETS-Session-ID";
@@ -61,7 +59,7 @@ public class CommonsHttpClient extends RetsHttpClient {
 	private final String userAgentPassword;
 
 	public CommonsHttpClient() {
-		this(new DefaultHttpClient(defaultConnectionManager(Integer.MAX_VALUE, Integer.MAX_VALUE), defaultParams(DEFAULT_TIMEOUT)), null, true);
+		this(new DefaultHttpClient(defaultConnectionManager(MAX_CONNECTIONS, MAX_CONNECTIONS), defaultParams(DEFAULT_TIMEOUT)), null, true);
 	}
 	
 	public CommonsHttpClient(int timeout, String userAgentPassword, boolean gzip) {
@@ -73,6 +71,11 @@ public class CommonsHttpClient extends RetsHttpClient {
 		this.userAgentPassword = userAgentPassword;
 
         this.httpClient = client;
+        /*client.setReuseStrategy(new ConnectionReuseStrategy() {
+			public boolean keepAlive(HttpResponse httpResponse, HttpContext httpContext) {
+				return false;
+			}
+        });*/
 		// ask the server if we can use gzip
 		if( gzip ) this.addDefaultHeader(ACCEPT_ENCODING, DEFLATE_ENCODINGS);
 	}

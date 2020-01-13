@@ -40,6 +40,7 @@
     	<artifactId>log4j</artifactId>
     	<version>1.2.9</version>
     	<optional>false</optional>
+        <scope>provided</scope>
     </dependency>
     <dependency>
     	<groupId>commons-lang</groupId>
@@ -105,6 +106,35 @@
           </execution>
         </executions>
       </plugin>
-      </plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <relocations>
+                <relocation>
+                  <pattern>com.google.common</pattern>
+                  <shadedPattern>org.realtors.rets.shaded.com.google.common</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache</pattern>
+                  <shadedPattern>org.realtors.rets.shaded.org.apache</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.jdom</pattern>
+                  <shadedPattern>org.realtors.rets.shaded.org.jdom</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>
